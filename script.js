@@ -1,20 +1,40 @@
-let outerWidth = 825;
-let outerHeight = 430;
-let rMin = 5;
-let rMax = 20;
+let outerWidth = 600;
+let outerHeight = 400;
+
+let margin = { left: 30, top: 30, right: 30, bottom: 30 };
+
+let innerWidth = outerWidth - margin.left - margin.right;
+let innerHeight = outerHeight - margin.top - margin.bottom;
+// let rMin = 5;
+// let rMax = 20;
+let rMin = 1;
+let rMax = 8;
 let xColumn = "sepal_length";
 let yColumn = "petal_length";
 let rColumn = "sepal_width";
+let colorColumn = "species";
 
+// outer area
 let svg = d3
     .select("body")
     .append("svg")
     .attr("width", outerWidth)
     .attr("height", outerHeight);
 
-let xScale = d3.scaleLinear().range([0, outerWidth]);
-let yScale = d3.scaleLinear().range([outerHeight, 0]);
+// inner visualisation area
+let g = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+let xScale = d3.scaleLinear().range([0, innerWidth]);
+let yScale = d3.scaleLinear().range([innerHeight, 0]);
 let rScale = d3.scaleLinear().range([rMin, rMax]);
+let colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+// g.append("g")
+//     .call(d3.axisBottom(xScale));
+// g.append("g")
+//     .call(d3.axisRight(yScale));
 
 function render(data) {
     xScale.domain(
@@ -33,7 +53,7 @@ function render(data) {
         })
     );
 
-    let circles = svg.selectAll("circle").data(data);
+    let circles = g.selectAll("circle").data(data);
     circles
         .enter()
         .append("circle")
@@ -45,6 +65,9 @@ function render(data) {
         })
         .attr("r", function(d) {
             return rScale(d[rColumn]);
+        })
+        .attr("fill", function(d) {
+            return colorScale(d[colorColumn]);
         });
 
     circles.exit().remove();
